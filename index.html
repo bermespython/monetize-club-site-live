@@ -7342,30 +7342,22 @@ Agents optimize for visual signal clarity, property-owner response rate, appoint
     <button class="auth-close" type="button" aria-label="Close" data-auth-close>×</button>
     <span class="auth-panel-eyebrow">Unlock prompt copying</span>
     <h2 id="auth-title">Sign in to open and copy templates.</h2>
-    <p class="auth-panel-copy">Create an account or sign in to open models and copy prompts.</p>
-    <form class="auth-local-form" data-auth-local-form>
-      <label class="auth-field-label" for="auth-email-input">Email</label>
+    <p class="auth-panel-copy">Browse first. When you want to open a model or copy the Naiive prompt, sign in with Google or email.</p>
+    <button class="auth-google" type="button" data-auth-google>Continue with Google</button>
+    <form class="auth-email-form" data-auth-email-form>
+      <label class="auth-field-label" for="auth-email-input">Continue with Email</label>
       <div class="auth-email-row">
         <input id="auth-email-input" class="auth-email-input" type="email" name="email" placeholder="you@company.com" required>
+        <button class="auth-email-submit" type="submit">Send magic link</button>
       </div>
-      <label class="auth-field-label" for="auth-phone-input">Phone number</label>
-      <div class="auth-email-row">
-        <input id="auth-phone-input" class="auth-email-input" type="tel" name="phone" placeholder="(555) 555-5555" required>
-      </div>
-      <label class="auth-field-label" for="auth-password-input">Password</label>
-      <div class="auth-email-row">
-        <input id="auth-password-input" class="auth-email-input" type="password" name="password" placeholder="Create a password" required>
-      </div>
-      <button class="auth-submit" type="submit" data-auth-submit>Create account</button>
-      <button class="auth-switch" type="button" data-auth-switch>Already have an account? Sign in</button>
     </form>
-    <p class="auth-panel-note" data-auth-note>This login only works in this browser for now.</p>
+    <p class="auth-panel-note">No password. We send a magic link and bring you back here.</p>
     <p class="auth-panel-status" data-auth-message></p>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="models-data.js?v=b3b8fc5"></script>
-<script src="app.js?v=b3b8fc5"></script>
+<script src="app.js?v=final-auth-fix"></script>
 </body>
 </html>

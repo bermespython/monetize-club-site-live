@@ -14,71 +14,40 @@
   var authModal = document.querySelector('[data-auth-modal]');
   var authOpenButtons = document.querySelectorAll('[data-auth-open]');
   var authCloseButtons = document.querySelectorAll('[data-auth-close]');
-  var authLocalForm = document.querySelector('[data-auth-local-form]');
-  var authSubmit = document.querySelector('[data-auth-submit]');
-  var authSwitch = document.querySelector('[data-auth-switch]');
-  var authNote = document.querySelector('[data-auth-note]');
+  var authEmailForm = document.querySelector('[data-auth-email-form]');
+  var authGoogleButton = document.querySelector('[data-auth-google]');
   var authMessage = document.querySelector('[data-auth-message]');
   var authStatus = document.querySelector('.auth-status');
   var authEmail = document.querySelector('[data-auth-email]');
   var authLogout = document.querySelector('[data-auth-logout]');
   var currentUser = null;
-  var authMode = 'signup';
-  var ACCOUNT_KEY = 'monetizeClubLocalAccount';
-  var SESSION_KEY = 'monetizeClubLocalSession';
-  var agentPlaybooks = {"dispatch-routing-arbitrage": [["CEO Agent", "Oversees response speed, routing quality, payment capture, provider quality, and market-change approval."], ["Demand Capture Agent", "Monitors inbound channels and responds inside the fastest conversion window."], ["Qualification Agent", "Determines urgency, fit, buyer quality, and probable purchase value."], ["Quote / Pricing Agent", "Applies the highest-converting approved pricing logic for this market."], ["Routing Agent", "Routes to the best provider or fulfillment path based on geography, margin, and close rate."], ["Provider QA Agent", "Tracks provider response, no-show risk, and downstream close quality."], ["Retention / Review Agent", "Captures reviews, referrals, and repeat demand after fulfillment."]], "lead-arbitrage": [["CEO Agent", "Owns lead quality, buyer routing, channel ROI, and adjacent-market approval."], ["Demand Intake Agent", "Captures every inbound lead immediately and standardizes intake."], ["Qualification Agent", "Ranks leads by purchase intent, fit, and economic value."], ["Routing / Matching Agent", "Routes leads to the best buyer, firm, or closer based on conversion data."], ["Follow-Up Agent", "Recovers unresponsive but still-qualified leads on a strict cadence."], ["Attribution Agent", "Tracks source, routing path, and downstream close quality."], ["Market Rotation Agent", "Flags weak markets and asks the user to approve the next one."]], "wholesale-assignment-arbitrage": [["CEO Agent", "Protects spread, buyer liquidity, and approved market rotation."], ["Opportunity Sourcing Agent", "Finds distressed, stale, under-marketed, or transferable opportunities."], ["Seller Qualification Agent", "Confirms distress, authority, timeline, and assignability signals."], ["Buyer-Match Agent", "Matches opportunity packages to the deepest real buyer pool first."], ["Spread / Assignment Agent", "Optimizes for assignable spread and buyer certainty."], ["Documentation Agent", "Keeps control/assignment paperwork and transfer steps clean."], ["Pivot Approval Agent", "Requests permission before switching to a new opportunity class."]], "quote-broker-arbitrage": [["CEO Agent", "Owns quote-to-close rate, routing quality, and waterfall optimization."], ["Intake Agent", "Standardizes buyer need and removes ambiguity fast."], ["Quote Gathering Agent", "Collects comparable offers from fragmented suppliers quickly."], ["Comparison Agent", "Ranks offers by conversion probability, price, and buyer fit."], ["Routing Agent", "Routes the buyer to the best close path or brokered offer."], ["Close Recovery Agent", "Recovers dropped deals and unresolved comparison shoppers."], ["Vendor Score Agent", "Tracks vendor responsiveness and close quality to improve the waterfall."]], "residual-brokerage-arbitrage": [["CEO Agent", "Owns book growth, residual yield, retention, and approved adjacent-market moves."], ["Account Acquisition Agent", "Finds accounts and books with the highest likely recurring value."], ["Audit / Savings Agent", "Proves the economic wedge needed to close the account."], ["Onboarding Agent", "Moves the account cleanly with the least churn risk."], ["Retention Agent", "Protects the book and surfaces churn risk early."], ["Portfolio Intelligence Agent", "Tracks yield by cohort, offer, and account type."], ["Expansion Agent", "Recommends adjacent account classes only after approval."]], "franchise-lead-routing-arbitrage": [["CEO Agent", "Owns network-level response speed, routing quality, and branch conversion."], ["Central Intake Agent", "Captures all inbound centrally in the brand voice."], ["Qualification Agent", "Qualifies and standardizes every lead before routing."], ["Location Routing Agent", "Routes to the right branch based on geography, capability, and close rate."], ["Booking Agent", "Pushes leads into the best scheduling path."], ["QA / Brand Agent", "Monitors brand consistency and branch quality leakage."], ["Network Optimization Agent", "Requests approval before shifting into a new chain category."]], "remote-render-mailout-arbitrage": [["CEO Agent", "Owns response rate, booked-value rate, provider close rate, and next-market approval."], ["Property Discovery Agent", "Scans maps, satellite, listings, and street view for visible opportunities."], ["Visual Opportunity Agent", "Scores visible defects and upgrades by likely purchase value and conversion."], ["Render / Mockup Agent", "Creates a simple before/after render or visual concept."], ["Outreach Agent", "Ships mail, text, or email outreach tied to that exact property and render."], ["Qualification Agent", "Qualifies owners who bite and ranks by near-term close likelihood."], ["Provider Routing Agent", "Routes the opportunity to the best provider and tracks close quality."]]};;
+  var agentPlaybooks = {"dispatch-routing-arbitrage": [["CEO Agent", "Oversees response speed, routing quality, payment capture, provider quality, and market-change approval."], ["Demand Capture Agent", "Monitors inbound channels and responds inside the fastest conversion window."], ["Qualification Agent", "Determines urgency, fit, buyer quality, and probable purchase value."], ["Quote / Pricing Agent", "Applies the highest-converting approved pricing logic for this market."], ["Routing Agent", "Routes to the best provider or fulfillment path based on geography, margin, and close rate."], ["Provider QA Agent", "Tracks provider response, no-show risk, and downstream close quality."], ["Retention / Review Agent", "Captures reviews, referrals, and repeat demand after fulfillment."]], "lead-arbitrage": [["CEO Agent", "Owns lead quality, buyer routing, channel ROI, and adjacent-market approval."], ["Demand Intake Agent", "Captures every inbound lead immediately and standardizes intake."], ["Qualification Agent", "Ranks leads by purchase intent, fit, and economic value."], ["Routing / Matching Agent", "Routes leads to the best buyer, firm, or closer based on conversion data."], ["Follow-Up Agent", "Recovers unresponsive but still-qualified leads on a strict cadence."], ["Attribution Agent", "Tracks source, routing path, and downstream close quality."], ["Market Rotation Agent", "Flags weak markets and asks the user to approve the next one."]], "wholesale-assignment-arbitrage": [["CEO Agent", "Protects spread, buyer liquidity, and approved market rotation."], ["Opportunity Sourcing Agent", "Finds distressed, stale, under-marketed, or transferable opportunities."], ["Seller Qualification Agent", "Confirms distress, authority, timeline, and assignability signals."], ["Buyer-Match Agent", "Matches opportunity packages to the deepest real buyer pool first."], ["Spread / Assignment Agent", "Optimizes for assignable spread and buyer certainty."], ["Documentation Agent", "Keeps clean buyer-ready packets, assignment logic, and close-critical details in order."], ["Disposition / Follow-Up Agent", "Works buyer list urgency, follow-up, and fallback routing when the first buyer stalls."]], "quote-broker-arbitrage": [["CEO Agent", "Optimizes quote request conversion, close quality, and broker margin while protecting market-rotation decisions."], ["Intake Agent", "Captures the request, normalizes key details, and starts the quote loop instantly."], ["Qualification Agent", "Separates real buyers from low-intent noise and scores quote quality."], ["Provider / Carrier Routing Agent", "Sends each opportunity to the best-fit provider path based on historical conversion and payout."], ["Quote Comparison Agent", "Packages quotes into the strongest buyer-facing presentation."], ["Close / Booking Agent", "Pushes for the booked outcome and next step immediately."], ["Retention Agent", "Creates repeat, referral, and re-quote loops after the initial close."]], "residual-brokerage-arbitrage": [["CEO Agent", "Owns retention, downstream yield, and approval before adjacent-market expansion."], ["Demand Capture Agent", "Captures inbound or outbound opportunities with strong residual value."], ["Qualification Agent", "Prioritizes prospects with durable repeat economics or long-tail payout value."], ["Placement Agent", "Routes the deal to the best-fit buyer, provider, or platform for long-term residual yield."], ["Onboarding Agent", "Makes handoff frictionless so fewer deals die in implementation."], ["Retention / Expansion Agent", "Increases lifetime value through expansion, stickiness, and review/referral loops."], ["Residual Tracking Agent", "Monitors recurring payout quality and flags churn risk early."]], "franchise-multi-location-lead-routing-arbitrage": [["CEO Agent", "Protects lead routing quality, location response-time discipline, and expansion sequencing."], ["Lead Intake Agent", "Captures inbound demand across all covered geographies."], ["Location Qualification Agent", "Matches demand to the right region, operator, or territory."], ["Routing Agent", "Sends leads to the highest-performing location or buyer path."], ["Follow-Up Agent", "Rescues leads when locations are slow or fail first contact."], ["QA / Attribution Agent", "Tracks which territories close, which leak, and where the next expansion should happen."], ["Expansion Agent", "Flags the next high-fragmentation geography and asks for approval before expansion."]], "remote-render-mailout-arbitrage": [["CEO Agent", "Owns response speed, appointment yield, creative throughput, and market-rotation approval."], ["Lead Sourcing Agent", "Finds high-probability properties, businesses, or assets worth outreach."], ["Render / Creative Agent", "Generates the visual upgrade, mockup, or concept package that gets attention."], ["Mail / Outreach Agent", "Deploys the physical or digital outbound sequence."], ["Follow-Up Agent", "Handles responses fast and moves interest to quote, consult, or appointment."], ["Close / Routing Agent", "Routes the booked opportunity to the right closer or provider path."], ["Performance Agent", "Measures which creative + market combinations actually convert and recommends the next test."]]};
 
   function setAuthMessage(message, isError) {
+    if (!authMessage) return;
     authMessage.textContent = message || '';
     authMessage.style.color = isError ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))';
   }
-  function getStoredAccount() {
-    try { return JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null'); } catch (e) { return null; }
-  }
-  function setStoredAccount(account) {
-    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
-  }
-  function getSessionEmail() {
-    return localStorage.getItem(SESSION_KEY) || '';
-  }
-  function setSessionEmail(email) {
-    if (email) localStorage.setItem(SESSION_KEY, email); else localStorage.removeItem(SESSION_KEY);
-  }
-  function setAuthMode(mode) {
-    authMode = mode;
-    if (!authSubmit || !authSwitch || !authNote) return;
-    authSubmit.textContent = mode === 'signup' ? 'Create account' : 'Sign in';
-    authSwitch.textContent = mode === 'signup' ? 'Already have an account? Sign in' : 'Need an account? Create one';
-    authNote.textContent = mode === 'signup' ? 'Your login is stored in this browser only for now.' : 'Use the email and password you created on this browser.';
-    var pass = document.getElementById('auth-password-input');
-    var phone = document.getElementById('auth-phone-input');
-    if (pass) pass.placeholder = mode === 'signup' ? 'Create a password' : 'Enter your password';
-    if (phone) {
-      if (mode === 'signup') {
-        phone.required = true;
-        phone.disabled = false;
-        phone.removeAttribute('aria-hidden');
-        phone.style.opacity = '1';
-        phone.placeholder = '(555) 555-5555';
-        phone.setAttribute('required', '');
-      } else {
-        phone.required = false;
-        phone.disabled = true;
-        phone.value = '';
-        phone.style.opacity = '0.55';
-        phone.placeholder = 'Phone number not required for sign in';
-        phone.removeAttribute('required');
-      }
-    }
-    setAuthMessage('', false);
-  }
   function openAuthModal(message) {
+    if (!authModal) return;
     authModal.hidden = false;
-    setAuthMessage(message || '', false);
+    document.body.style.overflow = 'hidden';
+    setAuthMessage(message || (!hasAuthConfig ? 'Auth is not configured yet for this build.' : ''), false);
   }
   function closeAuthModal() {
+    if (!authModal) return;
     authModal.hidden = true;
+    document.body.style.overflow = '';
     setAuthMessage('', false);
+  }
+  function closeOpenCards() {
+    if (!grid) return;
+    var openCards = grid.querySelectorAll('.card.is-open');
+    for (var i = 0; i < openCards.length; i++) {
+      openCards[i].classList.remove('is-open');
+      openCards[i].querySelector('.card-body').hidden = true;
+      openCards[i].querySelector('.expand-btn').setAttribute('aria-expanded', 'false');
+    }
   }
   function applyAuthState(user) {
     currentUser = user || null;
@@ -86,52 +55,40 @@
     if (authStatus) authStatus.hidden = !currentUser;
     for (var i = 0; i < authOpenButtons.length; i++) authOpenButtons[i].hidden = !!currentUser;
     if (authEmail) authEmail.textContent = currentUser && currentUser.email ? currentUser.email : '';
+    if (currentUser) closeAuthModal();
   }
-  function handleSession() {
-    var email = getSessionEmail();
-    if (!email) { applyAuthState(null); return; }
-    var account = getStoredAccount();
-    if (account && account.email === email) applyAuthState(account);
-    else applyAuthState(null);
-  }
-  function normalizePhone(v) {
-    return String(v || '').replace(/\D+/g, '');
+  async function initAuth() {
+    if (!hasAuthConfig || !supabase) {
+      applyAuthState(null);
+      return;
+    }
+    var sessionResult = await supabase.auth.getSession();
+    applyAuthState(sessionResult && sessionResult.data && sessionResult.data.session ? sessionResult.data.session.user : null);
+    supabase.auth.onAuthStateChange(function (_event, session) {
+      applyAuthState(session && session.user ? session.user : null);
+    });
   }
   for (var i = 0; i < authOpenButtons.length; i++) authOpenButtons[i].addEventListener('click', function(){ openAuthModal(''); });
   for (var j = 0; j < authCloseButtons.length; j++) authCloseButtons[j].addEventListener('click', closeAuthModal);
-  if (authLogout) authLogout.addEventListener('click', function(){ setSessionEmail(''); applyAuthState(null); });
-  if (authSwitch) authSwitch.addEventListener('click', function(){ setAuthMode(authMode === 'signup' ? 'login' : 'signup'); });
-  if (authLocalForm) authLocalForm.addEventListener('submit', function(event){
-    event.preventDefault();
-    var form = new FormData(authLocalForm);
-    var email = String(form.get('email') || '').trim().toLowerCase();
-    var phone = normalizePhone(form.get('phone'));
-    var password = String(form.get('password') || '');
-    if (authMode === 'signup') {
-      if (!email || !phone || !password) { setAuthMessage('Enter email, phone number, and password.', true); return; }
-    } else {
-      if (!email || !password) { setAuthMessage('Enter your email and password.', true); return; }
-    }
-    var account = getStoredAccount();
-    if (authMode === 'signup') {
-      if (account && account.email === email) { setAuthMessage('Account already exists on this browser. Sign in instead.', true); return; }
-      var newAccount = { email: email, phone: phone, password: password };
-      setStoredAccount(newAccount);
-      setSessionEmail(email);
-      applyAuthState(newAccount);
-      closeAuthModal();
-      authLocalForm.reset();
-      setAuthMode('login');
-      return;
-    }
-    if (!account) { setAuthMessage('No local account found on this browser. Create one first.', true); return; }
-    if (account.email !== email || account.password !== password) { setAuthMessage('Wrong email or password for this browser login.', true); return; }
-    setSessionEmail(email);
-    applyAuthState(account);
-    closeAuthModal();
+  if (authLogout) authLogout.addEventListener('click', function(){ if (!supabase) return; supabase.auth.signOut().then(function(){ closeOpenCards(); applyAuthState(null); }); });
+  if (authGoogleButton) authGoogleButton.addEventListener('click', function(){
+    if (!supabase) return openAuthModal('Auth is not configured yet for this build.');
+    setAuthMessage('Redirecting to Google…', false);
+    supabase.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href.split('#')[0] } }).then(function(res){ if (res.error) setAuthMessage(res.error.message, true); });
   });
-  setAuthMode('signup');
-  handleSession();
+  if (authEmailForm) authEmailForm.addEventListener('submit', function(event){
+    event.preventDefault();
+    var email = String(new FormData(authEmailForm).get('email') || '').trim();
+    if (!email) return;
+    if (!supabase) return openAuthModal('Auth is not configured yet for this build.');
+    setAuthMessage('Sending magic link…', false);
+    supabase.auth.signInWithOtp({ email: email, options:{ emailRedirectTo: window.location.href.split('#')[0] } }).then(function(res){
+      if (res.error) return setAuthMessage(res.error.message, true);
+      setAuthMessage('Magic link sent. Check your inbox, then come right back here.', false);
+      authEmailForm.reset();
+    });
+  });
+  initAuth();
 
   function renderPills(values) {
     return (values || []).map(function (value) { return '<span class="pill">' + value + '</span>'; }).join('');
@@ -232,13 +189,6 @@
   window.buildBundle = buildBundle;
   window.updateSelectedMarket = updateSelectedMarket;
 
-  for (var i = 0; i < authOpenButtons.length; i++) authOpenButtons[i].addEventListener('click', function(){ openAuthModal(hasAuthConfig ? '' : 'Auth is not configured yet for this build.'); });
-  for (var j = 0; j < authCloseButtons.length; j++) authCloseButtons[j].addEventListener('click', closeAuthModal);
-  if (authLogout) authLogout.addEventListener('click', function(){ if (!supabase) return; supabase.auth.signOut().then(function(){ applyAuthState(null); }); });
-  if (authGoogleButton) authGoogleButton.addEventListener('click', function(){ if (!supabase) return openAuthModal('Auth is not configured yet for this build.'); setAuthMessage('Redirecting to Google…', false); supabase.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href } }).then(function(res){ if (res.error) setAuthMessage(res.error.message, true); }); });
-  if (authEmailForm) authEmailForm.addEventListener('submit', function(event){ event.preventDefault(); var email = new FormData(authEmailForm).get('email'); if (!email) return; if (!supabase) return openAuthModal('Auth is not configured yet for this build.'); setAuthMessage('Sending magic link…', false); supabase.auth.signInWithOtp({ email:String(email), options:{ emailRedirectTo: window.location.href } }).then(function(res){ if (res.error) return setAuthMessage(res.error.message, true); setAuthMessage('Magic link sent. Check your inbox, then come right back here.', false); authEmailForm.reset(); }); });
-  if (supabase) supabase.auth.onAuthStateChange(function(_event, session){ applyAuthState(session && session.user ? session.user : null); });
-  handleSession();
 
   if (grid) grid.addEventListener('click', function(event){
     var head = event.target.closest('.card-head');
