@@ -54,8 +54,21 @@
     var phone = document.getElementById('auth-phone-input');
     if (pass) pass.placeholder = mode === 'signup' ? 'Create a password' : 'Enter your password';
     if (phone) {
-      phone.required = mode === 'signup';
-      phone.placeholder = mode === 'signup' ? '(555) 555-5555' : 'Phone number not required for sign in';
+      if (mode === 'signup') {
+        phone.required = true;
+        phone.disabled = false;
+        phone.removeAttribute('aria-hidden');
+        phone.style.opacity = '1';
+        phone.placeholder = '(555) 555-5555';
+        phone.setAttribute('required', '');
+      } else {
+        phone.required = false;
+        phone.disabled = true;
+        phone.value = '';
+        phone.style.opacity = '0.55';
+        phone.placeholder = 'Phone number not required for sign in';
+        phone.removeAttribute('required');
+      }
     }
     setAuthMessage('', false);
   }
