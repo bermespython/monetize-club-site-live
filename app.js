@@ -51,7 +51,12 @@
     authSwitch.textContent = mode === 'signup' ? 'Already have an account? Sign in' : 'Need an account? Create one';
     authNote.textContent = mode === 'signup' ? 'Your login is stored in this browser only for now.' : 'Use the email and password you created on this browser.';
     var pass = document.getElementById('auth-password-input');
+    var phone = document.getElementById('auth-phone-input');
     if (pass) pass.placeholder = mode === 'signup' ? 'Create a password' : 'Enter your password';
+    if (phone) {
+      phone.required = mode === 'signup';
+      phone.placeholder = mode === 'signup' ? '(555) 555-5555' : 'Phone number not required for sign in';
+    }
     setAuthMessage('', false);
   }
   function openAuthModal(message) {
@@ -89,7 +94,11 @@
     var email = String(form.get('email') || '').trim().toLowerCase();
     var phone = normalizePhone(form.get('phone'));
     var password = String(form.get('password') || '');
-    if (!email || !phone || !password) { setAuthMessage('Enter email, phone number, and password.', true); return; }
+    if (authMode === 'signup') {
+      if (!email || !phone || !password) { setAuthMessage('Enter email, phone number, and password.', true); return; }
+    } else {
+      if (!email || !password) { setAuthMessage('Enter your email and password.', true); return; }
+    }
     var account = getStoredAccount();
     if (authMode === 'signup') {
       if (account && account.email === email) { setAuthMessage('Account already exists on this browser. Sign in instead.', true); return; }
