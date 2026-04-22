@@ -205,6 +205,30 @@ em { font-family: "Hedvig Letters Serif", serif; font-style: italic; }
 .site-foot { max-width: 1280px; margin: 0 auto; padding: 56px 28px 80px; border-top: 1px solid hsl(var(--border)); display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
 .site-foot em { font-family: "Hedvig Letters Serif", serif; font-style: italic; text-transform: none; letter-spacing: 0; }
 
+body.auth-locked .card-head > *:not(.expand-btn),
+body.auth-locked .card-body > * {
+  filter: blur(7px);
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+body.auth-locked .card-head::after {
+  content: "Sign in to unlock";
+  position: absolute;
+  right: 28px;
+  top: 28px;
+  padding: 7px 10px;
+  border: 1px solid hsl(var(--foreground));
+  border-radius: 3px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--foreground));
+  background: hsla(var(--background) / 0.92);
+}
+body.auth-locked .expand-btn {
+  color: hsl(var(--foreground));
+}
 .auth-modal { position: fixed; inset: 0; z-index: 60; }
 .auth-backdrop { position: absolute; inset: 0; background: hsla(var(--background) / 0.74); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .auth-panel { position: relative; width: min(560px, calc(100vw - 40px)); margin: min(10vh, 72px) auto 0; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); padding: 28px; }
@@ -249,7 +273,7 @@ em { font-family: "Hedvig Letters Serif", serif; font-style: italic; }
 }
 </style>
 </head>
-<body>
+<body class="auth-locked">
 <header class="topbar">
   <div class="topbar-inner">
     <a href="#" class="brand">
@@ -7333,310 +7357,6 @@ Agents optimize for visual signal clarity, property-owner response rate, appoint
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="models-data.js"></script>
-<script>
-const createClient = window.supabase?.createClient || null;
-
-const MODELS = window.MONETIZE_MODELS || [];
-const MODEL_MAP = Object.fromEntries(MODELS.map(model => [model.id, model]));
-const SUPABASE_URL = "https://gzzbebbqcpcoqoxkuxhx.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_ggEnqtyZNZKcNfIr1CBH5Q_UZqOODD_";
-const hasAuthConfig = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
-const supabase = hasAuthConfig && createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-const state = Object.fromEntries(MODELS.map(model => [model.id, 0]));
-const grid = document.getElementById('grid');
-const authModal = document.querySelector('[data-auth-modal]');
-const authOpenButtons = document.querySelectorAll('[data-auth-open]');
-const authCloseButtons = document.querySelectorAll('[data-auth-close]');
-const authGoogleButton = document.querySelector('[data-auth-google]');
-const authEmailForm = document.querySelector('[data-auth-email-form]');
-const authMessage = document.querySelector('[data-auth-message]');
-const authStatus = document.querySelector('.auth-status');
-const authEmail = document.querySelector('[data-auth-email]');
-const authLogout = document.querySelector('[data-auth-logout]');
-let currentUser = null;
-
-const agentPlaybooks = {
-  'dispatch-routing-arbitrage': [
-    ['CEO Agent', 'Oversees response speed, routing quality, payment capture, provider quality, and market-change approval.'],
-    ['Demand Capture Agent', 'Monitors inbound channels and responds inside the fastest conversion window.'],
-    ['Qualification Agent', 'Determines urgency, fit, buyer quality, and probable purchase value.'],
-    ['Quote / Pricing Agent', 'Applies the highest-converting approved pricing logic for this market.'],
-    ['Routing Agent', 'Routes to the best provider or fulfillment path based on geography, margin, and close rate.'],
-    ['Provider QA Agent', 'Tracks provider response, no-show risk, and downstream close quality.'],
-    ['Retention / Review Agent', 'Captures reviews, referrals, and repeat demand after fulfillment.'],
-  ],
-  'lead-arbitrage': [
-    ['CEO Agent', 'Owns lead quality, buyer routing, channel ROI, and adjacent-market approval.'],
-    ['Demand Intake Agent', 'Captures every inbound lead immediately and standardizes intake.'],
-    ['Qualification Agent', 'Ranks leads by purchase intent, fit, and economic value.'],
-    ['Routing / Matching Agent', 'Routes leads to the best buyer, firm, or closer based on conversion data.'],
-    ['Follow-Up Agent', 'Recovers unresponsive but still-qualified leads on a strict cadence.'],
-    ['Attribution Agent', 'Tracks source, routing path, and downstream close quality.'],
-    ['Market Rotation Agent', 'Flags weak markets and asks the user to approve the next one.'],
-  ],
-  'wholesale-assignment-arbitrage': [
-    ['CEO Agent', 'Protects spread, buyer liquidity, and approved market rotation.'],
-    ['Opportunity Sourcing Agent', 'Finds distressed, stale, under-marketed, or transferable opportunities.'],
-    ['Seller Qualification Agent', 'Confirms distress, authority, timeline, and assignability signals.'],
-    ['Buyer-Match Agent', 'Matches opportunity packages to the deepest real buyer pool first.'],
-    ['Spread / Assignment Agent', 'Optimizes for assignable spread and buyer certainty.'],
-    ['Documentation Agent', 'Keeps control/assignment paperwork and transfer steps clean.'],
-    ['Pivot Approval Agent', 'Requests permission before switching to a new opportunity class.'],
-  ],
-  'quote-broker-arbitrage': [
-    ['CEO Agent', 'Owns quote-to-close rate, routing quality, and waterfall optimization.'],
-    ['Intake Agent', 'Standardizes buyer need and removes ambiguity fast.'],
-    ['Quote Gathering Agent', 'Collects comparable offers from fragmented suppliers quickly.'],
-    ['Comparison Agent', 'Ranks offers by conversion probability, price, and buyer fit.'],
-    ['Routing Agent', 'Routes the buyer to the best close path or brokered offer.'],
-    ['Close Recovery Agent', 'Recovers dropped deals and unresolved comparison shoppers.'],
-    ['Vendor Score Agent', 'Tracks vendor responsiveness and close quality to improve the waterfall.'],
-  ],
-  'residual-brokerage-arbitrage': [
-    ['CEO Agent', 'Owns book growth, residual yield, retention, and approved adjacent-market moves.'],
-    ['Account Acquisition Agent', 'Finds accounts and books with the highest likely recurring value.'],
-    ['Audit / Savings Agent', 'Proves the economic wedge needed to close the account.'],
-    ['Onboarding Agent', 'Moves the account cleanly with the least churn risk.'],
-    ['Retention Agent', 'Protects the book and surfaces churn risk early.'],
-    ['Portfolio Intelligence Agent', 'Tracks yield by cohort, offer, and account type.'],
-    ['Expansion Agent', 'Recommends adjacent account classes only after approval.'],
-  ],
-  'franchise-lead-routing-arbitrage': [
-    ['CEO Agent', 'Owns network-level response speed, routing quality, and branch conversion.'],
-    ['Central Intake Agent', 'Captures all inbound centrally in the brand voice.'],
-    ['Qualification Agent', 'Qualifies and standardizes every lead before routing.'],
-    ['Location Routing Agent', 'Routes to the right branch based on geography, capability, and close rate.'],
-    ['Booking Agent', 'Pushes leads into the best scheduling path.'],
-    ['QA / Brand Agent', 'Monitors brand consistency and branch quality leakage.'],
-    ['Network Optimization Agent', 'Requests approval before shifting into a new chain category.'],
-  ],
-  'remote-render-mailout-arbitrage': [
-    ['CEO Agent', 'Owns response rate, booked-value rate, provider close rate, and next-market approval.'],
-    ['Property Discovery Agent', 'Scans maps, satellite, listings, and street view for visible opportunities.'],
-    ['Visual Opportunity Agent', 'Scores visible defects and upgrades by likely purchase value and conversion.'],
-    ['Render / Mockup Agent', 'Creates a simple before/after render or visual concept.'],
-    ['Outreach Agent', 'Ships mail, text, or email outreach tied to that exact property and render.'],
-    ['Qualification Agent', 'Qualifies owners who bite and ranks by near-term close likelihood.'],
-    ['Provider Routing Agent', 'Routes the opportunity to the best provider and tracks close quality.'],
-  ],
-};
-
-function setAuthMessage(message, isError = false) {
-  authMessage.textContent = message || '';
-  authMessage.style.color = isError ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))';
-}
-function openAuthModal(message = '') {
-  authModal.hidden = false;
-  setAuthMessage(message, !hasAuthConfig && Boolean(message));
-}
-function closeAuthModal() {
-  authModal.hidden = true;
-  setAuthMessage('');
-}
-function applyAuthState(user) {
-  currentUser = user || null;
-  authStatus.hidden = !currentUser;
-  for (const button of authOpenButtons) button.hidden = Boolean(currentUser);
-  authEmail.textContent = currentUser?.email || '';
-}
-async function handleSession() {
-  if (!supabase) { applyAuthState(null); return; }
-  const { data, error } = await supabase.auth.getSession();
-  if (error) { setAuthMessage(error.message, true); applyAuthState(null); return; }
-  applyAuthState(data.session?.user || null);
-}
-for (const button of authOpenButtons) button.addEventListener('click', () => openAuthModal(hasAuthConfig ? '' : 'Auth is not configured yet for this build.'));
-for (const button of authCloseButtons) button.addEventListener('click', closeAuthModal);
-authLogout?.addEventListener('click', async () => {
-  if (!supabase) return;
-  const { error } = await supabase.auth.signOut();
-  if (error) return setAuthMessage(error.message, true);
-  applyAuthState(null);
-});
-authGoogleButton?.addEventListener('click', async () => {
-  if (!supabase) return openAuthModal('Auth is not configured yet for this build.');
-  setAuthMessage('Redirecting to Google…');
-  const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
-  if (error) setAuthMessage(error.message, true);
-});
-authEmailForm?.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const email = new FormData(authEmailForm).get('email');
-  if (!email) return;
-  if (!supabase) return openAuthModal('Auth is not configured yet for this build.');
-  setAuthMessage('Sending magic link…');
-  const { error } = await supabase.auth.signInWithOtp({ email: String(email), options: { emailRedirectTo: window.location.href } });
-  if (error) return setAuthMessage(error.message, true);
-  setAuthMessage('Magic link sent. Check your inbox, then come right back here.');
-  authEmailForm.reset();
-});
-if (supabase) supabase.auth.onAuthStateChange((_event, session) => applyAuthState(session?.user || null));
-handleSession();
-
-function renderPills(values) {
-  return values.map(value => `<span class="pill">${value}</span>`).join('');
-}
-
-function updateSelectedMarket(modelId) {
-  const model = MODEL_MAP[modelId];
-  const market = model.market_rows[state[modelId]];
-  document.querySelector(`[data-selected-market-name="${modelId}"]`).textContent = market.market;
-  document.querySelector(`[data-selected-market-why="${modelId}"]`).textContent = market.why_fragmented;
-  document.querySelector(`[data-selected-market-buyer="${modelId}"]`).textContent = market.buyer;
-  document.querySelector(`[data-selected-market-trigger="${modelId}"]`).textContent = market.trigger;
-  document.querySelector(`[data-selected-market-websites="${modelId}"]`).innerHTML = renderPills(market.websites);
-  document.querySelector(`[data-selected-market-marketplaces="${modelId}"]`).innerHTML = renderPills(market.marketplaces);
-  document.querySelector(`[data-selected-market-tools="${modelId}"]`).innerHTML = renderPills(market.tools);
-  const body = document.querySelector(`[data-market-table-body="${modelId}"]`);
-  body.querySelectorAll('.market-row').forEach((tr, idx) => tr.classList.toggle('is-selected', idx === state[modelId]));
-}
-
-function buildBundle(modelId) {
-  const model = MODEL_MAP[modelId];
-  const market = model.market_rows[state[modelId]];
-  const agents = agentPlaybooks[modelId] || [];
-  const parts = [
-    `# ${model.name.toUpperCase()} — ${market.market.toUpperCase()}`,
-    `## ${model.tagline}`,
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'SELECTED MODEL',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    model.overview,
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'HOW THIS MODEL WORKS',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    model.how_it_works,
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'SELECTED MARKET',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    `Market: ${market.market}`,
-    `Buyer: ${market.buyer}`,
-    `Trigger: ${market.trigger}`,
-    `Why this market is attractive: ${market.why_fragmented}`,
-    '',
-    'Websites to dominate / extract demand from:',
-    ...market.websites.map(v => `- ${v}`),
-    '',
-    'Marketplaces to exploit / test:',
-    ...market.marketplaces.map(v => `- ${v}`),
-    '',
-    'Core tools:',
-    ...market.tools.map(v => `- ${v}`),
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'AGENT ORG CHART',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    model.agent_org_chart,
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'MODEL FLOW LOOP',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    model.flow_loop,
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'GLOBAL OPERATING DIRECTIVES',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-    '- Optimize first for conversion rate, purchase value, and collection speed.',
-    '- Always waterfall to the highest-converting real data path available by channel, script, offer, provider, and buyer profile.',
-    '- If market-specific data is still sparse, default waterfall order is: speed-to-lead → qualification fit → highest purchase-value triggers → payment/deposit capture → persistent follow-up → route/provider quality → review/referral yield.',
-    '- Track source, response time, booked value, purchased value, close rate, margin/spread, and retention/repeat signals from day one.',
-    '- If the selected market underperforms for enough cycles, the CEO Agent must ask the operator to approve either (1) staying in-market with a tighter wedge, or (2) rotating to a new approved market from this same model table.',
-    '- No autonomous market switching without explicit operator approval.',
-    '',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    'AGENT ROLES',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-    '',
-  ];
-  for (const [name, mission] of agents) {
-    parts.push(`### ${name}`);
-    parts.push(mission);
-    parts.push('');
-  }
-  parts.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  parts.push('NAIIVE LAUNCH INSTRUCTIONS');
-  parts.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  parts.push('');
-  parts.push('1. Use this as the workspace brief and base operating system.');
-  parts.push('2. Build the agents in the order listed above, with the CEO Agent supervising every other agent.');
-  parts.push('3. Make the selected market the first live wedge — do not scatter across markets before the first one has enough signal.');
-  parts.push('4. Feed channel, response, purchase-value, and close data back into the waterfall logic daily.');
-  parts.push('5. If the market weakens, the CEO Agent must ask the operator for approval before testing the next market from the table.');
-  parts.push('');
-  parts.push('— Monetize Club');
-  return parts.join('\n');
-}
-
-grid.addEventListener('click', async (event) => {
-  const head = event.target.closest('.card-head');
-  if (head) {
-    const card = head.closest('.card');
-    const body = card.querySelector('.card-body');
-    const btn = card.querySelector('.expand-btn');
-    const isOpen = card.classList.contains('is-open');
-    grid.querySelectorAll('.card.is-open').forEach(other => {
-      if (other !== card) {
-        other.classList.remove('is-open');
-        other.querySelector('.card-body').hidden = true;
-        other.querySelector('.expand-btn').setAttribute('aria-expanded', 'false');
-      }
-    });
-    if (isOpen) {
-      card.classList.remove('is-open');
-      body.hidden = true;
-      btn.setAttribute('aria-expanded', 'false');
-    } else {
-      card.classList.add('is-open');
-      body.hidden = false;
-      btn.setAttribute('aria-expanded', 'true');
-      setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
-    }
-    return;
-  }
-
-  const row = event.target.closest('.market-row');
-  if (row) {
-    const card = row.closest('.card');
-    const modelId = card.dataset.modelId;
-    state[modelId] = Number(row.dataset.marketIndex);
-    updateSelectedMarket(modelId);
-    return;
-  }
-
-  const copyBtn = event.target.closest('.copy-btn');
-  if (copyBtn) {
-    event.stopPropagation();
-    if (!currentUser) {
-      openAuthModal('Sign in to copy the exact market launch prompt.');
-      return;
-    }
-    const bundle = buildBundle(copyBtn.dataset.copyModelId);
-    try {
-      await navigator.clipboard.writeText(bundle);
-      copyBtn.classList.add('is-copied');
-      setTimeout(() => copyBtn.classList.remove('is-copied'), 2400);
-    } catch (err) {
-      const ta = document.createElement('textarea');
-      ta.value = bundle;
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); } catch (_) {}
-      document.body.removeChild(ta);
-      copyBtn.classList.add('is-copied');
-      setTimeout(() => copyBtn.classList.remove('is-copied'), 2400);
-    }
-  }
-});
-</script>
+<script src="app.js"></script>
 </body>
 </html>
