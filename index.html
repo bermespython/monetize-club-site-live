@@ -229,9 +229,9 @@ body.auth-locked .card-head::after {
 body.auth-locked .expand-btn {
   color: hsl(var(--foreground));
 }
-.auth-modal { position: fixed; inset: 0; z-index: 60; }
-.auth-backdrop { position: absolute; inset: 0; background: hsla(var(--background) / 0.74); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.auth-panel { position: relative; width: min(560px, calc(100vw - 40px)); margin: min(10vh, 72px) auto 0; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); padding: 28px; }
+.auth-modal { position: fixed; inset: 0; z-index: 80; }
+.auth-backdrop { position: absolute; inset: 0; background: hsla(var(--background) / 0.9); backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%); }
+.auth-panel { position: relative; width: min(560px, calc(100vw - 40px)); margin: min(10vh, 72px) auto 0; background: hsl(var(--card)); border: 1px solid hsl(var(--foreground)); box-shadow: 0 24px 80px rgba(0,0,0,0.55); padding: 28px; }
 .auth-close { position: absolute; top: 16px; right: 16px; font-size: 26px; line-height: 1; color: hsl(var(--muted-foreground)); }
 .auth-close:hover { color: hsl(var(--foreground)); }
 .auth-panel-eyebrow { display: inline-block; margin-bottom: 16px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
