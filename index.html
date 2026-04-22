@@ -240,15 +240,16 @@ body.auth-locked .expand-btn {
 .auth-panel-copy { color: hsl(var(--foreground)); margin-bottom: 22px; }
 .auth-panel-note { color: hsl(var(--muted-foreground)); margin-top: 16px; }
 .auth-panel-status { min-height: 22px; margin-top: 16px; color: hsl(var(--foreground)); }
-.auth-google,.auth-email-submit { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid hsl(var(--foreground)); border-radius: 3px; padding: 0 16px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; transition: background 150ms ease, color 150ms ease, border-color 150ms ease; }
-.auth-google { width: 100%; margin-bottom: 18px; background: hsl(var(--foreground)); color: hsl(var(--background)); }
-.auth-google:hover,.auth-email-submit:hover { opacity: 0.88; }
-.auth-email-form { display: grid; gap: 12px; }
+.auth-submit,.auth-switch { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid hsl(var(--foreground)); border-radius: 3px; padding: 0 16px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; transition: background 150ms ease, color 150ms ease, border-color 150ms ease; }
+.auth-submit { width: 100%; background: hsl(var(--foreground)); color: hsl(var(--background)); }
+.auth-submit:hover,.auth-switch:hover { opacity: 0.88; }
+.auth-local-form { display: grid; gap: 12px; }
 .auth-field-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
-.auth-email-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+.auth-email-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .auth-email-input { min-height: 44px; width: 100%; border: 1px solid hsl(var(--border)); background: hsl(var(--background)); color: hsl(var(--foreground)); padding: 0 14px; border-radius: 3px; font: inherit; }
 .auth-email-input::placeholder { color: hsl(var(--muted-foreground)); }
 .auth-email-input:focus { outline: none; border-color: hsl(var(--foreground)); }
+.auth-switch { width: 100%; background: transparent; color: hsl(var(--foreground)); }
 
 @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 900px) {
@@ -7340,17 +7341,25 @@ Agents optimize for visual signal clarity, property-owner response rate, appoint
   <div class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="auth-title">
     <button class="auth-close" type="button" aria-label="Close" data-auth-close>×</button>
     <span class="auth-panel-eyebrow">Unlock prompt copying</span>
-    <h2 id="auth-title">Sign in to copy and launch the exact market prompt.</h2>
-    <p class="auth-panel-copy">Browse all models and markets first. When you’re ready to copy the launch bundle into Naiive, sign in with Google or email.</p>
-    <button class="auth-google" type="button" data-auth-google>Continue with Google</button>
-    <form class="auth-email-form" data-auth-email-form>
-      <label class="auth-field-label" for="auth-email-input">Continue with Email</label>
+    <h2 id="auth-title">Create your login to open and copy templates.</h2>
+    <p class="auth-panel-copy">This is a simple browser login for now. Create an account with email, phone number, and password, or sign in with the one you already made on this browser.</p>
+    <form class="auth-local-form" data-auth-local-form>
+      <label class="auth-field-label" for="auth-email-input">Email</label>
       <div class="auth-email-row">
         <input id="auth-email-input" class="auth-email-input" type="email" name="email" placeholder="you@company.com" required>
-        <button class="auth-email-submit" type="submit">Send magic link</button>
       </div>
+      <label class="auth-field-label" for="auth-phone-input">Phone number</label>
+      <div class="auth-email-row">
+        <input id="auth-phone-input" class="auth-email-input" type="tel" name="phone" placeholder="(555) 555-5555" required>
+      </div>
+      <label class="auth-field-label" for="auth-password-input">Password</label>
+      <div class="auth-email-row">
+        <input id="auth-password-input" class="auth-email-input" type="password" name="password" placeholder="Create a password" required>
+      </div>
+      <button class="auth-submit" type="submit" data-auth-submit>Create account</button>
+      <button class="auth-switch" type="button" data-auth-switch>Already have an account? Sign in</button>
     </form>
-    <p class="auth-panel-note">No passwords. No extra steps. We’ll send a secure magic link and bring you right back here.</p>
+    <p class="auth-panel-note" data-auth-note>Your login is stored in this browser only for now.</p>
     <p class="auth-panel-status" data-auth-message></p>
   </div>
 </div>
