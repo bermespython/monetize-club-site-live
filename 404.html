@@ -108,6 +108,40 @@ em { font-family: "Hedvig Letters Serif", serif; font-style: italic; }
 }
 .topbar-nav a { border: none; }
 .topbar-nav a:hover { color: hsl(var(--foreground)); }
+.auth-trigger,
+.auth-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 3px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--foreground));
+  transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+.auth-trigger:hover,
+.auth-logout:hover {
+  background: hsl(var(--accent));
+  border-color: hsl(var(--foreground));
+}
+.auth-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.auth-email {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: hsl(var(--foreground));
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ============================================================
    Hero
@@ -486,6 +520,159 @@ em { font-family: "Hedvig Letters Serif", serif; font-style: italic; }
 }
 
 /* ============================================================
+   Auth lock + modal
+   ============================================================ */
+body.auth-locked .card-head > *:not(.expand-btn),
+body.auth-locked .card-body > * {
+  filter: blur(7px);
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+body.auth-locked .card-head::after {
+  content: "Sign in to unlock";
+  position: absolute;
+  right: 28px;
+  top: 28px;
+  padding: 7px 10px;
+  border: 1px solid hsl(var(--foreground));
+  border-radius: 3px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--foreground));
+  background: hsla(var(--background) / 0.92);
+}
+body.auth-locked .expand-btn {
+  color: hsl(var(--foreground));
+}
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.auth-backdrop {
+  position: absolute;
+  inset: 0;
+  background: hsla(var(--background) / 0.74);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.auth-panel {
+  position: relative;
+  width: min(560px, calc(100vw - 40px));
+  margin: min(10vh, 72px) auto 0;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  padding: 28px;
+}
+.auth-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 26px;
+  line-height: 1;
+  color: hsl(var(--muted-foreground));
+}
+.auth-close:hover { color: hsl(var(--foreground)); }
+.auth-panel-eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+.auth-panel h2 {
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  max-width: 12ch;
+  margin-bottom: 18px;
+}
+.auth-panel-copy,
+.auth-panel-note,
+.auth-panel-status {
+  font-size: 14px;
+  line-height: 1.65;
+}
+.auth-panel-copy {
+  color: hsl(var(--foreground));
+  margin-bottom: 22px;
+}
+.auth-panel-note {
+  color: hsl(var(--muted-foreground));
+  margin-top: 16px;
+}
+.auth-panel-status {
+  min-height: 22px;
+  margin-top: 16px;
+  color: hsl(var(--foreground));
+}
+.auth-google,
+.auth-email-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid hsl(var(--foreground));
+  border-radius: 3px;
+  padding: 0 16px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.auth-google {
+  width: 100%;
+  margin-bottom: 18px;
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+}
+.auth-google:hover,
+.auth-email-submit:hover {
+  opacity: 0.88;
+}
+.auth-email-form {
+  display: grid;
+  gap: 12px;
+}
+.auth-field-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+.auth-email-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+.auth-email-input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  padding: 0 14px;
+  border-radius: 3px;
+  font: inherit;
+}
+.auth-email-input::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+.auth-email-input:focus {
+  outline: none;
+  border-color: hsl(var(--foreground));
+}
+@media (max-width: 720px) {
+  .auth-status { display: none !important; }
+  .auth-trigger { padding: 8px 12px; font-size: 11px; }
+  .auth-email-row { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
    Footer
    ============================================================ */
 .site-foot {
@@ -522,6 +709,11 @@ em { font-family: "Hedvig Letters Serif", serif; font-style: italic; }
     <nav class="topbar-nav">
       <a href="#why">Why this playbook</a>
       <a href="#models">Models</a>
+      <button class="auth-trigger" type="button" data-auth-open>Unlock templates</button>
+      <div class="auth-status" hidden>
+        <span class="auth-email" data-auth-email></span>
+        <button class="auth-logout" type="button" data-auth-logout>Log out</button>
+      </div>
     </nav>
   </div>
 </header>
@@ -1240,12 +1432,160 @@ Enterprise margins: 70%+ at scale. High setup costs offset by long contract term
   <span><em>Pick one. Build the loop. Ship.</em></span>
 </footer>
 
-<script>
-// Card expansion - only one open at a time
+<div class="auth-modal" hidden data-auth-modal>
+  <div class="auth-backdrop" data-auth-close></div>
+  <div class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <button class="auth-close" type="button" aria-label="Close" data-auth-close>×</button>
+    <span class="auth-panel-eyebrow">Unlock the template library</span>
+    <h2 id="auth-title">Sign in to open, copy, and use the full bundles.</h2>
+    <p class="auth-panel-copy">Browse everything first. When you're ready to open a model or copy the Naiive bundle, sign in with Google or email.</p>
+    <button class="auth-google" type="button" data-auth-google>Continue with Google</button>
+    <form class="auth-email-form" data-auth-email-form>
+      <label class="auth-field-label" for="auth-email-input">Continue with Email</label>
+      <div class="auth-email-row">
+        <input id="auth-email-input" class="auth-email-input" type="email" name="email" placeholder="you@company.com" required>
+        <button class="auth-email-submit" type="submit">Send magic link</button>
+      </div>
+    </form>
+    <p class="auth-panel-note">No passwords. No extra steps. We’ll send a secure magic link and bring you right back here.</p>
+    <p class="auth-panel-status" data-auth-message></p>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+const hasAuthConfig = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const supabase = hasAuthConfig ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const body = document.body;
 const grid = document.getElementById('grid');
+const authModal = document.querySelector('[data-auth-modal]');
+const authOpenButtons = document.querySelectorAll('[data-auth-open]');
+const authCloseButtons = document.querySelectorAll('[data-auth-close]');
+const authGoogleButton = document.querySelector('[data-auth-google]');
+const authEmailForm = document.querySelector('[data-auth-email-form]');
+const authMessage = document.querySelector('[data-auth-message]');
+const authStatus = document.querySelector('.auth-status');
+const authEmail = document.querySelector('[data-auth-email]');
+const authLogout = document.querySelector('[data-auth-logout]');
+let currentUser = null;
+
+function setAuthMessage(message, isError = false) {
+  authMessage.textContent = message || '';
+  authMessage.style.color = isError ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))';
+}
+
+function openAuthModal(message = '') {
+  authModal.hidden = false;
+  setAuthMessage(message, !hasAuthConfig && Boolean(message));
+}
+
+function closeAuthModal() {
+  authModal.hidden = true;
+  setAuthMessage('');
+}
+
+function applyAuthState(user) {
+  currentUser = user || null;
+  body.classList.toggle('auth-locked', !currentUser);
+  authStatus.hidden = !currentUser;
+  for (const button of authOpenButtons) {
+    button.hidden = Boolean(currentUser);
+  }
+  if (currentUser) {
+    authEmail.textContent = currentUser.email || 'Signed in';
+    closeAuthModal();
+  } else {
+    authEmail.textContent = '';
+  }
+}
+
+async function handleSession() {
+  if (!supabase) {
+    applyAuthState(null);
+    return;
+  }
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    setAuthMessage(error.message, true);
+    applyAuthState(null);
+    return;
+  }
+  applyAuthState(data.session?.user || null);
+}
+
+for (const button of authOpenButtons) {
+  button.addEventListener('click', () => {
+    openAuthModal(hasAuthConfig ? '' : 'Auth is not configured yet for this build. Add the Supabase URL and anon key, then rebuild.');
+  });
+}
+for (const button of authCloseButtons) {
+  button.addEventListener('click', closeAuthModal);
+}
+
+authLogout?.addEventListener('click', async () => {
+  if (!supabase) return;
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    setAuthMessage(error.message, true);
+    return;
+  }
+  applyAuthState(null);
+});
+
+authGoogleButton?.addEventListener('click', async () => {
+  if (!supabase) {
+    openAuthModal('Auth is not configured yet for this build. Add the Supabase URL and anon key, then rebuild.');
+    return;
+  }
+  setAuthMessage('Redirecting to Google…');
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href },
+  });
+  if (error) setAuthMessage(error.message, true);
+});
+
+authEmailForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const email = new FormData(authEmailForm).get('email');
+  if (!email) return;
+  if (!supabase) {
+    openAuthModal('Auth is not configured yet for this build. Add the Supabase URL and anon key, then rebuild.');
+    return;
+  }
+  setAuthMessage('Sending magic link…');
+  const { error } = await supabase.auth.signInWithOtp({
+    email: String(email),
+    options: { emailRedirectTo: window.location.href },
+  });
+  if (error) {
+    setAuthMessage(error.message, true);
+    return;
+  }
+  setAuthMessage('Magic link sent. Check your inbox, then come right back here.');
+  authEmailForm.reset();
+});
+
+if (supabase) {
+  supabase.auth.onAuthStateChange((_event, session) => {
+    applyAuthState(session?.user || null);
+  });
+}
+
+await handleSession();
+
+// Card expansion - only one open at a time
 grid.addEventListener('click', (e) => {
   const head = e.target.closest('.card-head');
   if (head) {
+    if (!currentUser) {
+      openAuthModal('Sign in to open the full model breakdown and copy bundle.');
+      return;
+    }
     const card = head.closest('.card');
     const body = card.querySelector('.card-body');
     const btn  = card.querySelector('.expand-btn');
@@ -1281,6 +1621,10 @@ grid.addEventListener('click', async (e) => {
   const btn = e.target.closest('.copy-btn');
   if (!btn) return;
   e.stopPropagation();
+  if (!currentUser) {
+    openAuthModal('Sign in to copy the full bundle.');
+    return;
+  }
   const bundle = JSON.parse(btn.getAttribute('data-bundle'));
   try {
     await navigator.clipboard.writeText(bundle);
