@@ -161,6 +161,10 @@
   if (grid) grid.addEventListener('click', function(event){
     var head = event.target.closest('.card-head');
     if (head) {
+      if (!currentUser) {
+        openAuthModal('Sign in or create your account to open this template.');
+        return;
+      }
       var card = head.closest('.card');
       var body = card.querySelector('.card-body');
       var btn = card.querySelector('.expand-btn');
