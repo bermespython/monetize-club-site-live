@@ -57,7 +57,7 @@
   function setAuthMode(mode) {
     authMode = mode;
     if (authSubmit) authSubmit.textContent = mode === 'signup' ? 'Create account' : 'Sign in';
-    if (authSwitch) authSwitch.textContent = mode === 'signup' ? 'Already have an account? Sign in' : 'Need an account? Create one';
+    if (authSwitch) authSwitch.textContent = mode === 'signup' ? 'Switch to sign in' : 'Switch to create account';
     if (authNote) authNote.textContent = mode === 'signup' ? 'Use a normal email/password login. No magic link.' : 'Sign in with the email and password you already created.';
     if (authPasswordInput) authPasswordInput.placeholder = mode === 'signup' ? 'Create a password' : 'Enter your password';
     setAuthMessage('', false);
