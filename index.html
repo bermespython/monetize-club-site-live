@@ -102,6 +102,7 @@ em { font-family: "Hedvig Letters Serif", serif; font-style: italic; }
 .auth-trigger:hover,.auth-logout:hover { background: hsl(var(--accent)); border-color: hsl(var(--foreground)); }
 .auth-status { display: inline-flex; align-items: center; gap: 12px; }
 .auth-status[hidden] { display: none !important; }
+.auth-trigger[hidden] { display: none !important; }
 .auth-email { font-size: 11px; letter-spacing: 0.06em; text-transform: none; color: hsl(var(--foreground)); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .hero {
@@ -7363,6 +7364,6 @@ Agents optimize for visual signal clarity, property-owner response rate, appoint
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="models-data.js?v=b3b8fc5"></script>
-<script src="app.js?v=button-clarity-fix"></script>
+<script src="app.js?v=auth-dom-fix"></script>
 </body>
 </html>
