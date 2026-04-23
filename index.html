@@ -7341,17 +7341,22 @@ Agents optimize for visual signal clarity, property-owner response rate, appoint
   <div class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="auth-title">
     <button class="auth-close" type="button" aria-label="Close" data-auth-close>×</button>
     <span class="auth-panel-eyebrow">Unlock prompt copying</span>
-    <h2 id="auth-title">Sign in to open and copy templates.</h2>
-    <p class="auth-panel-copy">Browse first. When you want to open a model or copy the Naiive prompt, sign in with Google or email.</p>
+    <h2 id="auth-title">Create your account or sign in.</h2>
+    <p class="auth-panel-copy">Use your email and password to open models and copy prompts.</p>
     <button class="auth-google" type="button" data-auth-google>Continue with Google</button>
     <form class="auth-email-form" data-auth-email-form>
-      <label class="auth-field-label" for="auth-email-input">Continue with Email</label>
+      <label class="auth-field-label" for="auth-email-input">Email</label>
       <div class="auth-email-row">
         <input id="auth-email-input" class="auth-email-input" type="email" name="email" placeholder="you@company.com" required>
-        <button class="auth-email-submit" type="submit">Send magic link</button>
       </div>
+      <label class="auth-field-label" for="auth-password-input">Password</label>
+      <div class="auth-email-row">
+        <input id="auth-password-input" class="auth-email-input" type="password" name="password" placeholder="Create a password" required>
+      </div>
+      <button class="auth-email-submit" type="submit" data-auth-submit>Create account</button>
+      <button class="auth-switch" type="button" data-auth-switch>Already have an account? Sign in</button>
     </form>
-    <p class="auth-panel-note">No password. We send a magic link and bring you back here.</p>
+    <p class="auth-panel-note" data-auth-note>Use a normal email/password login. No magic link.</p>
     <p class="auth-panel-status" data-auth-message></p>
   </div>
 </div>
