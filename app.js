@@ -105,7 +105,15 @@
       ? supabase.auth.signUp({ email: email, password: password })
       : supabase.auth.signInWithPassword({ email: email, password: password });
     authPromise.then(function(res){
-      if (res.error) return setAuthMessage(res.error.message, true);
+      if (res.error) {
+        var message = res.error.message || 'Auth failed.';
+        if (message === 'Invalid login credentials') {
+          message = authMode === 'signin'
+            ? 'Wrong email or password, or this account has not been created/confirmed yet.'
+            : 'Could not create account. Try a different email or wait a minute if you just tested this repeatedly.';
+        }
+        return setAuthMessage(message, true);
+      }
       var session = res.data && res.data.session ? res.data.session : null;
       var user = res.data && res.data.user ? res.data.user : null;
       if (session && session.user) {
